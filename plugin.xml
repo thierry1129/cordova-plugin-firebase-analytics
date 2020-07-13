@@ -1,7 +1,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android"
            id="cordova-plugin-firebase-analytics"
-      version="4.3.0">
+      version="4.3.1">
 
     <name>FirebaseAnalyticsPlugin</name>
     <description>Cordova plugin for Firebase Analytics</description>
@@ -59,6 +59,11 @@ xmlns:android="http://schemas.android.com/apk/res/android"
                 <param name="android-package" value="by.chemerisuk.cordova.firebase.FirebaseAnalyticsPlugin" />
                 <param name="onload" value="$FIREBASE_ANALYTICS_COLLECTION_ENABLED" />
             </feature>
+        </config-file>
+
+        <config-file target="config.xml" parent="/*">
+            <preference name="GradlePluginGoogleServicesEnabled" value="true" />
+            <preference name="GradlePluginGoogleServicesVersion" value="4.3.3" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/*">
