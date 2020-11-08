@@ -32,27 +32,7 @@ public class FirebaseAnalyticsPlugin extends ReflectiveCordovaPlugin {
 
     @CordovaMethod
     private void logEvent(String name, JSONObject params, CallbackContext callbackContext) throws JSONException {
-        Bundle bundle = new Bundle();
-        Iterator<String> it = params.keys();
-
-        while (it.hasNext()) {
-            String key = it.next();
-            Object value = params.get(key);
-
-            if (value instanceof String) {
-                bundle.putString(key, (String)value);
-            } else if (value instanceof Integer) {
-                bundle.putInt(key, (Integer)value);
-            } else if (value instanceof Double) {
-                bundle.putDouble(key, (Double)value);
-            } else if (value instanceof Long) {
-                bundle.putLong(key, (Long)value);
-            } else {
-                Log.w(TAG, "Value for key " + key + " not one of (String, Integer, Double, Long)");
-            }
-        }
-
-        this.firebaseAnalytics.logEvent(name, bundle);
+        this.firebaseAnalytics.logEvent(name, parse(params));
 
         callbackContext.success();
     }
@@ -85,14 +65,43 @@ public class FirebaseAnalyticsPlugin extends ReflectiveCordovaPlugin {
         callbackContext.success();
     }
 
-    @CordovaMethod(ExecutionThread.UI)
+    @CordovaMethod
     private void setCurrentScreen(String screenName, CallbackContext callbackContext) {
-        firebaseAnalytics.setCurrentScreen(
-            cordova.getActivity(),
-            screenName,
-            null
-        );
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, screenName);
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
 
         callbackContext.success();
+    }
+
+    @CordovaMethod
+    private void setDefaultEventParameters(JSONObject params, CallbackContext callbackContext) throws JSONException {
+        this.firebaseAnalytics.setDefaultEventParameters(parse(params));
+
+        callbackContext.success();
+    }
+
+    private static Bundle parse(JSONObject params) throws JSONException {
+        Bundle bundle = new Bundle();
+        Iterator<String> it = params.keys();
+
+        while (it.hasNext()) {
+            String key = it.next();
+            Object value = params.get(key);
+
+            if (value instanceof String) {
+                bundle.putString(key, (String)value);
+            } else if (value instanceof Integer) {
+                bundle.putInt(key, (Integer)value);
+            } else if (value instanceof Double) {
+                bundle.putDouble(key, (Double)value);
+            } else if (value instanceof Long) {
+                bundle.putLong(key, (Long)value);
+            } else {
+                Log.w(TAG, "Value for key " + key + " not one of (String, Integer, Double, Long)");
+            }
+        }
+
+        return bundle;
     }
 }
